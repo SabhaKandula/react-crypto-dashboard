@@ -1,5 +1,6 @@
 import React from "react";
 import styled, { css } from "styled-components";
+import { AppContext } from "./AppProvider";
 
 const Bar = styled.div`
   display: grid;
@@ -12,17 +13,27 @@ const Logo = styled.div`
 `;
 const ControlButtonElem = styled.div`
   cursor: pointer;
-  text-transform: capitalize;
   ${props =>
     props.active &&
     css`
       text-shadow: 0px 0px 60px #03ff03;
     `};
 `;
-function ControlButton({ name, active }) {
-  return <ControlButtonElem active={active}>{name}</ControlButtonElem>;
+function toProperCase(lower) {
+  return lower.charAt(0).toUpperCase() + lower.substr(1);
 }
 
+function ControlButton({ name, active }) {
+  return (
+    <AppContext.Consumer>
+      {({ page, setPage }) => (
+        <ControlButtonElem active={page === name} onClick={() => setPage(name)}>
+          {toProperCase(name)}
+        </ControlButtonElem>
+      )}
+    </AppContext.Consumer>
+  );
+}
 export default function AppBar() {
   return (
     <Bar>
