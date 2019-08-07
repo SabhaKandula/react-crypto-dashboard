@@ -2,17 +2,28 @@ import React, { Component } from "react";
 import { async } from "q";
 const cc = require("cryptocompare");
 export const AppContext = React.createContext();
-
+const MAX_FAVORITES = 10;
 export class AppProvider extends Component {
   constructor(props) {
     super(props);
     this.state = {
       page: "dashboard",
+      favorites: ["BTC", "XMR", "ETH", "DOGE"],
       ...this.savedSettings(),
       setPage: this.setPage,
-      confirmFavorites: this.confirmFavorites
+      confirmFavorites: this.confirmFavorites,
+      addCoin: this.addCoin
     };
   }
+  addCoin = key => {
+    let favorites = [...this.favorites];
+    if (favorites.length < MAX_FAVORITES) {
+      favorites.push(key);
+      this.setState({
+        favorites
+      });
+    }
+  };
   componentDidMount() {
     this.fetchCoins();
   }
