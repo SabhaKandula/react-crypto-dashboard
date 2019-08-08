@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { async } from "q";
+import _ from "lodash";
 const cc = require("cryptocompare");
 export const AppContext = React.createContext();
 const MAX_FAVORITES = 10;
@@ -12,17 +12,25 @@ export class AppProvider extends Component {
       ...this.savedSettings(),
       setPage: this.setPage,
       confirmFavorites: this.confirmFavorites,
-      addCoin: this.addCoin
+      addCoin: this.addCoin,
+      removeCoin: this.removeCoin,
+      isInFavorites: this.isInFavorites
     };
   }
   addCoin = key => {
-    let favorites = [...this.favorites];
+    let favorites = [...this.state.favorites];
     if (favorites.length < MAX_FAVORITES) {
       favorites.push(key);
       this.setState({
         favorites
       });
     }
+  };
+  removeCoin = key => {
+    let favorites = [...this.state.favorites];
+    this.setState({
+      favorites: _.pull(favorites, key)
+    });
   };
   componentDidMount() {
     this.fetchCoins();
@@ -42,7 +50,7 @@ export class AppProvider extends Component {
     localStorage.setItem(
       "cryptoDash",
       JSON.stringify({
-        test: "hello"
+        favorites: this.state.favorites
       })
     );
   };
@@ -57,8 +65,10 @@ export class AppProvider extends Component {
     if (!cryptoDashData) {
       return { page: "settings", firstVisit: true };
     }
-    return {};
+    let { favorites } = cryptoDashData;
+    return { favorites };
   }
+  isInFavorites = key => _.includes(this.state.favorites, key);
   render() {
     return (
       <AppContext.Provider value={this.state}>
