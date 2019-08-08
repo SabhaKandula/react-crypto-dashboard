@@ -14,7 +14,8 @@ export class AppProvider extends Component {
       confirmFavorites: this.confirmFavorites,
       addCoin: this.addCoin,
       removeCoin: this.removeCoin,
-      isInFavorites: this.isInFavorites
+      isInFavorites: this.isInFavorites,
+      setFilteredCoins: this.setFilteredCoins
     };
   }
   addCoin = key => {
@@ -69,6 +70,7 @@ export class AppProvider extends Component {
     return { favorites };
   }
   isInFavorites = key => _.includes(this.state.favorites, key);
+  setFilteredCoins = filteredCoins => this.setState({ filteredCoins });
   render() {
     return (
       <AppContext.Provider value={this.state}>
