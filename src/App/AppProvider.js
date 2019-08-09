@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import _ from "lodash";
+import moment from "moment";
 const cc = require("cryptocompare");
 export const AppContext = React.createContext();
 const MAX_FAVORITES = 10;
+const TIME_UNITS = 10;
+
 export class AppProvider extends Component {
   constructor(props) {
     super(props);
@@ -61,8 +64,41 @@ export class AppProvider extends Component {
   componentDidMount() {
     this.fetchCoins();
     this.fetchPrices();
+    this.fetchHistorical();
   }
 
+  fetchHistorical = async () => {
+    if (this.state.firstVisit) return;
+    let results = await this.historical();
+    let historical = [
+      {
+        name: this.state.currentFavorite,
+        data: results.map((ticker, index) => [
+          moment()
+            .subtract({ months: TIME_UNITS - index })
+            .valueOf(),
+          ticker.USD
+        ])
+      }
+    ];
+    this.setState({ historical });
+  };
+
+  historical = () => {
+    let promises = [];
+    for (let units = TIME_UNITS; units > 0; units--) {
+      promises.push(
+        cc.priceHistorical(
+          this.state.currentFavorite,
+          ["USD"],
+          moment()
+            .subtract({ months: units })
+            .toDate()
+        )
+      );
+    }
+    return Promise.all(promises);
+  };
   fetchCoins = async () => {
     let coinList = await cc.coinList();
     coinList = coinList.Data;
@@ -77,7 +113,9 @@ export class AppProvider extends Component {
       {
         page: "dashboard",
         firstVisit: false,
-        currentFavorite
+        currentFavorite,
+        prices: null,
+        historical: null
       },
       () => this.fetchPrices()
     );
@@ -96,9 +134,13 @@ export class AppProvider extends Component {
     });
   };
   setCurrentFavorite = sym => {
-    this.setState({
-      currentFavorite: sym
-    });
+    this.setState(
+      {
+        currentFavorite: sym,
+        historical: null
+      },
+      this.fetchHistorical
+    );
     localStorage.setItem(
       "cryptoDash",
       JSON.stringify({
