@@ -1,10 +1,10 @@
 ## Cryptocurrency Dashboard with React 
 
-# Live URL:
+####  Live WebApp  URL:
 https://crypto-dashboard-srk.netlify.com/
 
 
-# Frameworks/API's used in this Applicaton
+#### Frameworks/API's used in this Applicaton
 
 React & React Context API for State Management
 
@@ -27,7 +27,7 @@ localStorage : Save Coins
 
 
 
-# Dashboard Features
+#### Dashboard Features
 
 Settings Page
 
