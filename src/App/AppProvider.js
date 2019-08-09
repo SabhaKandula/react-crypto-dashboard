@@ -19,7 +19,9 @@ export class AppProvider extends Component {
       removeCoin: this.removeCoin,
       isInFavorites: this.isInFavorites,
       setFilteredCoins: this.setFilteredCoins,
-      setCurrentFavorite: this.setCurrentFavorite
+      setCurrentFavorite: this.setCurrentFavorite,
+      changeChartSelect: this.changeChartSelect,
+      timeInterval: "months"
     };
   }
 
@@ -75,7 +77,7 @@ export class AppProvider extends Component {
         name: this.state.currentFavorite,
         data: results.map((ticker, index) => [
           moment()
-            .subtract({ months: TIME_UNITS - index })
+            .subtract({ [this.state.timeInterval]: TIME_UNITS - index })
             .valueOf(),
           ticker.USD
         ])
@@ -92,7 +94,7 @@ export class AppProvider extends Component {
           this.state.currentFavorite,
           ["USD"],
           moment()
-            .subtract({ months: units })
+            .subtract({ [this.state.timeInterval]: units })
             .toDate()
         )
       );
@@ -159,6 +161,11 @@ export class AppProvider extends Component {
   }
   isInFavorites = key => _.includes(this.state.favorites, key);
   setFilteredCoins = filteredCoins => this.setState({ filteredCoins });
+  changeChartSelect = value => {
+    this.setState({ timeInterval: value, historical: null }, () =>
+      this.fetchHistorical()
+    );
+  };
   render() {
     return (
       <AppContext.Provider value={this.state}>
